@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Super Cool ToDo List</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/extra.css">
+    <link rel="stylesheet" href="css/fa/css/font-awesome.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="col-xs-12" style="height:50px;"></div>
+    <div id="newstuff">
+        <input class="form-control" v-on:keyup.enter="addMessage" v-model="message" placeholder="Add Something">
+    </div>
+    <hr>
+    <div id="thelist">
+        <div class="card">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item" v-for="todo in todos">
+                    <a  v-on:click="remMessage(todo.id)" class="tag float-xs-right"><i class="fa fa-times" aria-hidden="true"></i></a>
+                    {{ todo.text }}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="js/vue.js"></script>
+<script>
+    var the_list = new Vue({
+        el: '#thelist',
+        data: {
+            todos: [ ]
+        },
+        methods: {
+            remMessage: function (theid) {
+                arr = 0;
+                var BreakException = {};
+                try {
+                    the_list.todos.forEach(function (element) {
+                        if (element.id === theid) {
+                            throw BreakException
+                        } else {
+                            arr += 1;
+                        }
+                    });
+                } catch (e) {
+                    if (e !== BreakException) throw e;
+                }
+                the_list.todos.splice(arr, 1);
+                localStorage.setItem('list', JSON.stringify(the_list.todos));
+            }
+        }
+    });
+    var counter = 0;
+
+    if (localStorage.getItem("list") === null){
+        the_list.todos.push({text: 'You can delete this message :D', 'id': 0});
+    } else {
+        var prevlist = JSON.parse(localStorage.getItem('list'));
+        prevlist.forEach(function (element) {
+            the_list.todos.push({'text': element.text, 'id': counter});
+            counter += 1;
+        });
+    }
+
+    var newstuff = new Vue({
+        el: '#newstuff',
+        data: {
+            message: ''
+        },
+        methods: {
+            addMessage: function () {
+                counter += 1;
+                the_list.todos.push({text: this.message, 'id': counter});
+                this.message = '';
+                localStorage.setItem('list', JSON.stringify(the_list.todos));
+            }
+        }
+    })
+</script>
+
+</body>
+</html>
